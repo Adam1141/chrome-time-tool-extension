@@ -33,7 +33,7 @@ const TimeMenu: FC<TimeMenuProps> = ({ dateObj, timeOptions }) => {
 				<div
 					className={`${
 						isMenuOpen ? '' : 'hidden'
-					} flex flex-col max-h-80 gap-y-1 bg-indigo-100 rounded-sm transition-all duration-1000`}
+					} flex flex-col pr-3 max-h-80 gap-y-1 bg-indigo-100 rounded-sm transition-all duration-1000`}
 				>
 					{isMenuOpen &&
 						timeOptions.map((timeOption, idx) => {

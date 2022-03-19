@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
-// import tippy from 'tippy.js';
 import { FaCopy } from 'react-icons/fa';
 import { AiOutlineDown } from 'react-icons/ai';
 import { BsFillCheckCircleFill } from 'react-icons/bs';
@@ -41,20 +40,6 @@ const TimeMenuItem: FC<TimeMenuItemProps> = ({
 		setTimeout(() => {
 			item.current && (item.current.style.opacity = '1');
 		}, showAfterMs);
-
-		// tippy('#btn-copy', {
-		// 	content:
-		// 		'<p class="bg-indigo-100 text-indigo-800 border-0 outline-none rounded-md py-1 px-2">COPIED</p>',
-		// 	allowHTML: true,
-		// 	placement: 'left',
-		// 	trigger: 'click',
-		// 	arrow: true,
-		// 	onTrigger(instance: any) {
-		// 		setTimeout(() => {
-		// 			instance.hide();
-		// 		}, 500);
-		// 	},
-		// });
 	}, []);
 
 	return (

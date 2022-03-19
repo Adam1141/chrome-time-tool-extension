@@ -1,9 +1,10 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import TimeMenu from './components/TimeMenu';
 import { BsPauseCircleFill, BsPlayCircleFill } from 'react-icons/bs';
-import './index.css';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
+import './index.css';
+import InputDateAndTime from './components/InputDateAndTime';
 
 const App: FC = () => {
 	const [timeOptions, setTimeOptions] = useState([
@@ -45,7 +46,7 @@ const App: FC = () => {
 
 	function updateTime() {
 		if (!isRealtimeUpdateOn) return;
-		setDate(new Date());
+		if (!date) setDate(new Date());
 		const timeoutToken = setTimeout(() => {
 			let isOn;
 			setIsRealtimeUpdateOn((cur) => {
@@ -102,21 +103,25 @@ const App: FC = () => {
 			<h1 className="bg-indigo-200 text-center text-2xl py-4 rounded-sm">
 				Time Tool
 			</h1>
-			<div className="mt-4 mb-2 pl-1 hover:cursor-pointer ">
-				{isRealtimeUpdateOn ? (
-					<BsPauseCircleFill
-						id="pause-time-updates"
-						onClick={handlePlayPauseRealtimeClick}
-						className="text-3xl text-indigo-500 hover:text-indigo-400 transition-all duration-300 border-none outline-none"
-					/>
-				) : (
-					<BsPlayCircleFill
-						id="continue-time-updates"
-						onClick={handlePlayPauseRealtimeClick}
-						className="text-3xl text-indigo-500 hover:text-indigo-400 transition-all duration-300 border-none outline-none"
-					/>
-				)}
+			<div className='flex items-center gap-x-2 my-2'>
+				<div className="pl-1 hover:cursor-pointer">
+					{isRealtimeUpdateOn ? (
+						<BsPauseCircleFill
+							id="pause-time-updates"
+							onClick={handlePlayPauseRealtimeClick}
+							className="text-3xl text-indigo-500 hover:text-indigo-400 transition-all duration-300 border-none outline-none"
+						/>
+					) : (
+						<BsPlayCircleFill
+							id="continue-time-updates"
+							onClick={handlePlayPauseRealtimeClick}
+							className="text-3xl text-indigo-500 hover:text-indigo-400 transition-all duration-300 border-none outline-none"
+						/>
+					)}
+				</div>
+				<InputDateAndTime isRealtimeUpdateOn={isRealtimeUpdateOn} setIsRealtimeUpdateOn={setIsRealtimeUpdateOn} date={date} setDate={setDate} />
 			</div>
+
 			<TimeMenu dateObj={date} timeOptions={timeOptions} />
 		</div>
 	);
