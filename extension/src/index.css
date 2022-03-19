@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.tippy-box[data-theme~='te'] {
+	background-color: rgb(99 102 241);
+	color: #ffffff;
+}
+.tippy-box[data-theme~='te'][data-placement^='top'] > .tippy-arrow::before {
+	border-top-color: rgb(99 102 241);
+}
+.tippy-box[data-theme~='te'][data-placement^='bottom'] > .tippy-arrow::before {
+	border-bottom-color: rgb(99 102 241);
+}
+.tippy-box[data-theme~='te'][data-placement^='left'] > .tippy-arrow::before {
+    border-left-color: rgb(99 102 241);}
+.tippy-box[data-theme~='te'][data-placement^='right'] > .tippy-arrow::before {
+    border-right-color: rgb(99 102 241);}
