@@ -26,7 +26,6 @@ const MagicDateTimeInput: FC<MagicDateTimeInputProps> = ({
 		if (isValid)
 			setMenuDate(
 				momentFromString
-					.subtract(momentFromString.utcOffset(), 'm')
 					.toDate(),
 			);
 
