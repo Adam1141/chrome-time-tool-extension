@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { FaCopy } from 'react-icons/fa';
-import { AiOutlineDown } from 'react-icons/ai';
+import { AiOutlineDown, AiOutlineGlobal } from 'react-icons/ai';
 import { BsFillCheckCircleFill } from 'react-icons/bs';
 
 interface TimeMenuItemProps {

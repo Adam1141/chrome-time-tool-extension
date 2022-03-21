@@ -17,6 +17,7 @@
 		"react-scripts": "5.0.0",
 		"react-select": "^5.2.2",
 		"tippy.js": "^6.3.7",
+		"tw-elements": "^1.0.0-alpha11",
 		"typescript": "^4.6.2"
 	},
 	"scripts": {

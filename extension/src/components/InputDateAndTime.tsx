@@ -3,6 +3,7 @@ import moment from 'moment';
 
 interface InputDateAndTimeProps {
 	initialDate?: Date;
+	menuDate: Date;
 	setDate: React.Dispatch<React.SetStateAction<Date>>;
 	isRealtimeUpdateOn?: boolean;
 	setIsRealtimeUpdateOn?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -11,6 +12,7 @@ interface InputDateAndTimeProps {
 
 const InputDateAndTime: FC<InputDateAndTimeProps> = ({
 	initialDate = new Date(),
+	menuDate,
 	setDate,
 	setMenuDate,
 	isRealtimeUpdateOn,
@@ -31,7 +33,7 @@ const InputDateAndTime: FC<InputDateAndTimeProps> = ({
 	return (
 		<div>
 			<input
-				className="bg-indigo-100 py-1 px-3 rounded-md"
+				className="bg-indigo-100 py-1 px-3 rounded-md focus:outline-indigo-300 h-9 w-80"
 				type="datetime-local"
 				name="year"
 				onChange={(e) => {
@@ -40,8 +42,9 @@ const InputDateAndTime: FC<InputDateAndTimeProps> = ({
 					setMenuDate(new Date(e.target.value));
 					console.log(`date: ${new Date(e.target.value)}`);
 				}}
-			 	onInvalid={(e) => e.preventDefault()}
-				defaultValue={moment(initialDate)
+				onInvalid={(e) => e.preventDefault()}
+				value={moment(menuDate)
+					.subtract(menuDate.getTimezoneOffset(), 'm')
 					.toISOString()
 					.split('')
 					.slice(0, -1)

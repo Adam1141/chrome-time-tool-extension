@@ -22,21 +22,6 @@ const timeOptions: {
 		label: 'Epoch Milliseconds',
 		valueCb: (dateObj: Date) => '' + dateObj.getTime(),
 	},
-	{
-		label: 'Local',
-		valueCb: (dateObj: Date) => '' + dateObj.toString(),
-	},
-	{ label: 'ISO', valueCb: (dateObj: Date) => dateObj.toISOString() },
-	{ label: 'UTC', valueCb: (dateObj: Date) => dateObj.toUTCString() },
-	{
-		label: 'Epoch Seconds',
-		valueCb: (dateObj: Date) =>
-			'' + parseInt('' + dateObj.getTime() / 1000),
-	},
-	{
-		label: 'Epoch Milliseconds',
-		valueCb: (dateObj: Date) => '' + dateObj.getTime(),
-	},
 ];
 interface TimeMenuProps {
 	menuDate: Date;
