@@ -76,6 +76,7 @@ const MagicDateTimeInput: FC<MagicDateTimeInputProps> = ({
 	}
 
 	useEffect(() => {
+		if (!dateString) setIsProcessing(false);
 		const timeoutToken = setTimeout(() => {
 			setIsGood(dateString && guessDateFromDateString());
 			setIsProcessing(false);
@@ -99,7 +100,7 @@ const MagicDateTimeInput: FC<MagicDateTimeInputProps> = ({
 			});
 		}, 100);
 
-		console.log(`isGood= ${isGood}`);
+		// console.log(`isGood= ${isGood}`);
 		return () => {
 			incorrectInstance.forEach((v) => {
 				if (v.hasOwnProperty('destroy')) v.destroy();
