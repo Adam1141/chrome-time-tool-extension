@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import TimeMenuItem from './TimeMenuItem';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 import moment, { Moment } from 'moment-timezone';
+import 'moment/min/locales';
 
 interface TimeMenuProps {
 	menuMoment: Moment;
@@ -42,7 +43,8 @@ const TimeMenu: FC<TimeMenuProps> = ({ menuMoment, selectedTimezone }) => {
 		},
 		{
 			label: 'Epoch Milliseconds',
-			valueCb: (momentObj: Moment) => '' + momentObj.tz(selectedTimezone.current),
+			valueCb: (momentObj: Moment) =>
+				'' + momentObj.tz(selectedTimezone.current),
 		},
 		...Object.keys(moment.HTML5_FMT).map((objKey) => {
 			return {
@@ -56,6 +58,47 @@ const TimeMenu: FC<TimeMenuProps> = ({ menuMoment, selectedTimezone }) => {
 						.format(moment.HTML5_FMT[objKey]),
 			};
 		}),
+		{
+			label:'L',
+			valueCb: (momentObj: Moment) => momentObj.format(moment.localeData().longDateFormat('L'))
+		},
+		{
+			label:'l',
+			valueCb: (momentObj: Moment) => momentObj.format(moment.localeData().longDateFormat('l'))
+		},
+		{
+			label:'LL',
+			valueCb: (momentObj: Moment) => momentObj.format(moment.localeData().longDateFormat('LL'))
+		},
+		{
+			label:'ll',
+			valueCb: (momentObj: Moment) => momentObj.format(moment.localeData().longDateFormat('ll'))
+		},
+		{
+			label:'LLL',
+			valueCb: (momentObj: Moment) => momentObj.format(moment.localeData().longDateFormat('LLL'))
+		},
+		{
+			label:'lll',
+			valueCb: (momentObj: Moment) => momentObj.format(moment.localeData().longDateFormat('lll'))
+		},
+		{
+			label:'LLLL',
+			valueCb: (momentObj: Moment) => momentObj.format(moment.localeData().longDateFormat('LLLL'))
+		},
+		{
+			label:'llll',
+			valueCb: (momentObj: Moment) => momentObj.format(moment.localeData().longDateFormat('llll'))
+		},
+		{
+			label:'LT',
+			valueCb: (momentObj: Moment) => momentObj.format(moment.localeData().longDateFormat('LT'))
+		},
+		{
+			label:'LTS',
+			valueCb: (momentObj: Moment) => momentObj.format(moment.localeData().longDateFormat('LTS'))
+		},
+		
 	]);
 
 	return (

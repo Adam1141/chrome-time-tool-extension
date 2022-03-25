@@ -194,15 +194,20 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 
 				<AsyncSelect
 					ref={timezoneSelectMenu}
-					className="text-xs w-full text-indigo-900"
+					className="text-xs text-indigo-900"
 					defaultValue={{
 						label: moment.tz.guess(),
 						value: moment.tz.guess(),
 					}}
-					defaultOptions={timezoneOptions.slice(0, maxTimezoneItemsAtOnce.current)}
+					defaultOptions={timezoneOptions.slice(
+						0,
+						maxTimezoneItemsAtOnce.current,
+					)}
 					onChange={(e: any) => {
 						selectedTimezone.current = e.value;
-						setMenuMoment(moment(menuMoment).tz(selectedTimezone.current));
+						setMenuMoment(
+							moment(menuMoment).tz(selectedTimezone.current),
+						);
 					}}
 					placeholder="Search.."
 					cacheOptions
@@ -213,20 +218,22 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 						menu: (provided, state) => ({
 							...provided,
 							background: 'rgb(224 231 255)',
+							width: '150px',
 						}),
 						control: (provided, state) => ({
 							...provided,
 							background: 'rgb(224 231 255)',
+							width: '150px',
 						}),
 					}}
 					theme={(theme) => ({
 						...theme,
 						borderRadius: 5,
 						colors: {
-						  ...theme.colors,
-						  primary25: 'rgb(199 210 254)',
+							...theme.colors,
+							primary25: 'rgb(199 210 254)',
 						},
-					  })}
+					})}
 				/>
 			</div>
 			<TimeMenu

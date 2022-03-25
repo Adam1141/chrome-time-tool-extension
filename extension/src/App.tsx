@@ -8,10 +8,12 @@ import moment from 'moment-timezone';
 const App: FC = () => {
 	const selectedTimezone = useRef(moment.tz.guess());
 	const [isRealtimeUpdateOn, setIsRealtimeUpdateOn] = useState(true);
-	const [globMoment, setGlobMoment] = useState(moment().tz(selectedTimezone.current));
-
+	const [globMoment, setGlobMoment] = useState(
+		moment().tz(selectedTimezone.current),
+	);
+	// moment.locale('fr');
 	return (
-		<div className="flex flex-col bg-indigo-50 max-w-xl w-auto p-2 ">
+		<div className="flex flex-col bg-indigo-50 max-w-xl p-2 h-full">
 			<h1 className="bg-indigo-200 text-center text-2xl py-4 rounded-sm">
 				Time Tool
 			</h1>
