@@ -6,28 +6,31 @@ import TimeMenu from './TimeMenu';
 import { ImMagicWand } from 'react-icons/im';
 import { AiFillCalendar } from 'react-icons/ai';
 import tippy from 'tippy.js';
+import moment, { Moment } from 'moment';
 
 interface TimeMenuWithOptionsProps {
 	isRealtimeUpdateOn: boolean;
 	setIsRealtimeUpdateOn: React.Dispatch<React.SetStateAction<boolean>>;
-	setDate: React.Dispatch<React.SetStateAction<Date>>;
-	initialDate: Date;
+	setGlobMoment: React.Dispatch<React.SetStateAction<Moment>>;
+	initialMoment: Moment;
 }
 
 const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 	isRealtimeUpdateOn,
 	setIsRealtimeUpdateOn,
-	setDate,
-	initialDate,
+	setGlobMoment,
+	initialMoment,
 }) => {
-	const [menuDate, setMenuDate] = useState(initialDate);
+	const [menuMoment, setMenuMoment] = useState(initialMoment);
 	const [realtimeUpdateInterval, setRealtimeUpdateInterval] = useState(1000);
 	const [isMagicInputOn, setIsMagicInputOn] = useState(false);
 	const tippyMagincInputInstance = useRef<any>(null);
 
 	function updateTime() {
 		if (!isRealtimeUpdateOn) return;
-		if (!menuDate) setMenuDate(new Date());
+		if (!menuMoment) setMenuMoment(moment());
+		const milliseconds = moment().milliseconds();
+		const wiatForMs = 1000 - milliseconds;
 		const timeoutToken = setTimeout(() => {
 			let isOn;
 			setIsRealtimeUpdateOn((cur) => {
@@ -35,9 +38,9 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 				return cur;
 			});
 			if (!isOn) return;
-			setMenuDate(new Date());
+			setMenuMoment(moment());
 			updateTime();
-		}, realtimeUpdateInterval);
+		}, wiatForMs);
 		return timeoutToken;
 	}
 
@@ -47,10 +50,11 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 
 	useEffect(() => {
 		const timeoutToken: any = updateTime();
+
 		return () => {
 			clearTimeout(timeoutToken);
 		};
-	}, [realtimeUpdateInterval, isRealtimeUpdateOn]);
+	}, [isRealtimeUpdateOn]);
 
 	useEffect(() => {
 		tippy('#pause-time-updates', {
@@ -111,6 +115,7 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 		// 	isMagicInputOn ? 'Normal Date Input' : 'Magic Date Input',
 		// );
 	}, [isMagicInputOn]);
+
 	return (
 		<div>
 			<div className="flex items-center gap-x-2 my-2">
@@ -130,14 +135,17 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 					)}
 				</div>
 				{(isMagicInputOn && (
-					<MagicDateTimeInput setIsRealtimeUpdateOn={setIsRealtimeUpdateOn} setMenuDate={setMenuDate} />
+					<MagicDateTimeInput
+						setIsRealtimeUpdateOn={setIsRealtimeUpdateOn}
+						setMenuMoment={setMenuMoment}
+					/>
 				)) || (
 					<InputDateAndTime
-						menuDate={menuDate}
+						menuMoment={menuMoment}
 						isRealtimeUpdateOn={isRealtimeUpdateOn}
 						setIsRealtimeUpdateOn={setIsRealtimeUpdateOn}
-						setDate={setDate}
-						setMenuDate={setMenuDate}
+						setGlobMoment={setGlobMoment}
+						setMenuMoment={setMenuMoment}
 					/>
 				)}
 				<div
@@ -152,7 +160,7 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 					)}
 				</div>
 			</div>
-			<TimeMenu menuDate={menuDate} />
+			<TimeMenu menuMoment={menuMoment} />
 		</div>
 	);
 };

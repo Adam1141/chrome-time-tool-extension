@@ -1,34 +1,30 @@
 import React, { FC, useEffect, useRef, useState, memo } from 'react';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
 interface InputDateAndTimeProps {
-	initialDate?: Date;
-	menuDate: Date;
-	setDate: React.Dispatch<React.SetStateAction<Date>>;
+	initialMoment?: Moment;
+	menuMoment: Moment;
+	setGlobMoment: React.Dispatch<React.SetStateAction<Moment>>;
 	isRealtimeUpdateOn?: boolean;
 	setIsRealtimeUpdateOn?: React.Dispatch<React.SetStateAction<boolean>>;
-	setMenuDate: React.Dispatch<React.SetStateAction<Date>>;
+	setMenuMoment: React.Dispatch<React.SetStateAction<Moment>>;
 }
 
 const InputDateAndTime: FC<InputDateAndTimeProps> = ({
-	initialDate = new Date(),
-	menuDate,
-	setDate,
-	setMenuDate,
+	initialMoment = moment(),
+	menuMoment,
+	setGlobMoment,
+	setMenuMoment,
 	isRealtimeUpdateOn,
 	setIsRealtimeUpdateOn,
 }) => {
-	const [selectedDate, setSelectedDate] = useState();
-	const counter = useRef(0);
 	useEffect(() => {
-		const dateString = moment()
-			.toISOString()
-			.split('')
-			.slice(0, -1)
-			.join('');
-		// console.log(dateString);
-		// counter.current ++;
-		// console.log(`rendered ${counter.current} times`)
+		// console.log(
+		// 	menuMoment.subtract(menuMoment.utcOffset()).toISOString(true)
+		// );
+		console.log(
+			menuMoment.toISOString(true).split('').slice(0, -6).join(''),
+		);
 	});
 	return (
 		<div>
@@ -38,16 +34,15 @@ const InputDateAndTime: FC<InputDateAndTimeProps> = ({
 				name="year"
 				onChange={(e) => {
 					setIsRealtimeUpdateOn && setIsRealtimeUpdateOn(false);
-					setDate(new Date(e.target.value));
-					setMenuDate(new Date(e.target.value));
-					console.log(`date: ${new Date(e.target.value)}`);
+					setGlobMoment(moment(e.target.value));
+					setMenuMoment(moment(e.target.value));
+					// console.log(`date: ${new Date(e.target.value)}`);
 				}}
 				onInvalid={(e) => e.preventDefault()}
-				value={moment(menuDate)
-					.subtract(menuDate.getTimezoneOffset(), 'm')
-					.toISOString()
+				value={menuMoment
+					.toISOString(true)
 					.split('')
-					.slice(0, -1)
+					.slice(0, -6)
 					.join('')}
 			/>
 		</div>

@@ -3,9 +3,10 @@ import TimeMenu from './components/TimeMenu';
 import 'tippy.js/dist/tippy.css';
 import './index.css';
 import TimeMenuWithOptions from './components/TimeMenuWithOptions';
+import moment from 'moment';
 
 const App: FC = () => {
-	const [date, setDate] = useState(new Date());
+	const [globMoment, setGlobMoment] = useState(moment());
 	const [isRealtimeUpdateOn, setIsRealtimeUpdateOn] = useState(true);
 
 	// delete later
@@ -24,8 +25,8 @@ const App: FC = () => {
 			<TimeMenuWithOptions
 				isRealtimeUpdateOn={isRealtimeUpdateOn}
 				setIsRealtimeUpdateOn={setIsRealtimeUpdateOn}
-				initialDate={new Date(date)}
-				setDate={setDate}
+				initialMoment={globMoment}
+				setGlobMoment={setGlobMoment}
 			/>
 		</div>
 	);

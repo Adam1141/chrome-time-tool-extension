@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import {
 	ChasingDots,
 	Circle,
@@ -33,12 +33,12 @@ import {
 import tippy, { Instance, Props } from 'tippy.js';
 
 interface MagicDateTimeInputProps {
-	setMenuDate: React.Dispatch<React.SetStateAction<Date>>;
+	setMenuMoment: React.Dispatch<React.SetStateAction<Moment>>;
 	setIsRealtimeUpdateOn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const MagicDateTimeInput: FC<MagicDateTimeInputProps> = ({
-	setMenuDate,
+	setMenuMoment,
 	setIsRealtimeUpdateOn,
 }) => {
 	const [dateString, setDateString] = useState<any>(null);
@@ -65,7 +65,7 @@ const MagicDateTimeInput: FC<MagicDateTimeInputProps> = ({
 			? moment(parseInt(dateString))
 			: moment(dateString);
 		const isValid = momentFromString.isValid();
-		if (isValid) setMenuDate(momentFromString.toDate());
+		if (isValid) setMenuMoment(momentFromString);
 
 		console.log(
 			`${dateString} is a ${

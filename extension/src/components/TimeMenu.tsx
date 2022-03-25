@@ -2,32 +2,44 @@ import React, { FC } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import TimeMenuItem from './TimeMenuItem';
 import { Scrollbars } from 'react-custom-scrollbars-2';
+import moment from 'moment';
+import { Moment } from 'moment';
+const _ = require('lodash');
+
 
 const timeOptions: {
 	label: String;
-	valueCb: (dateObj: Date) => String;
+	valueCb: (momentObj: Moment) => String;
 }[] = [
 	{
 		label: 'Local',
-		valueCb: (dateObj: Date) => '' + dateObj.toString(),
+		valueCb: (momentObj: Moment) => '' + momentObj.local().toString(),
 	},
-	{ label: 'ISO', valueCb: (dateObj: Date) => dateObj.toISOString() },
-	{ label: 'UTC', valueCb: (dateObj: Date) => dateObj.toUTCString() },
+	{ label: 'ISO', valueCb: (momentObj: Moment) => momentObj.toISOString() },
+	{
+		label: 'UTC',
+		valueCb: (momentObj: Moment) => momentObj.utc().toString(),
+	},
 	{
 		label: 'Epoch Seconds',
-		valueCb: (dateObj: Date) =>
-			'' + parseInt('' + dateObj.getTime() / 1000),
+		valueCb: (momentObj: Moment) => momentObj.unix().toString(),
 	},
 	{
 		label: 'Epoch Milliseconds',
-		valueCb: (dateObj: Date) => '' + dateObj.getTime(),
+		valueCb: (momentObj: Moment) => '' + momentObj,
 	},
+	...Object.keys(moment.HTML5_FMT).map(objKey => {
+		return {
+			label: objKey.split('_').map(word => _.capitalize(word) ).join(' '),
+			valueCb: (momentObj: Moment) => moment().format(moment.HTML5_FMT[objKey])
+		};
+	})
 ];
 interface TimeMenuProps {
-	menuDate: Date;
+	menuMoment: Moment;
 }
 
-const TimeMenu: FC<TimeMenuProps> = ({ menuDate = new Date() }) => {
+const TimeMenu: FC<TimeMenuProps> = ({ menuMoment = moment() }) => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [timeToShowListItem, setTimeToShowListItem] = useState(50);
 
@@ -35,7 +47,7 @@ const TimeMenu: FC<TimeMenuProps> = ({ menuDate = new Date() }) => {
 		<div className="pb-2">
 			<TimeMenuItem
 				label={timeOptions[0].label}
-				value={timeOptions[0].valueCb(menuDate)}
+				value={timeOptions[0].valueCb(menuMoment)}
 				isMenuOpen={isMenuOpen}
 				setIsMenuOpen={setIsMenuOpen}
 				isFirstInList={true}
@@ -53,7 +65,7 @@ const TimeMenu: FC<TimeMenuProps> = ({ menuDate = new Date() }) => {
 									<TimeMenuItem
 										key={idx}
 										label={timeOption.label}
-										value={timeOption.valueCb(menuDate)}
+										value={timeOption.valueCb(menuMoment)}
 										isMenuOpen={isMenuOpen}
 										showAfterMs={idx * timeToShowListItem}
 									/>
