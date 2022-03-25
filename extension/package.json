@@ -12,6 +12,7 @@
 		"better-react-spinkit": "^2.0.4",
 		"lodash": "^4.17.21",
 		"moment": "^2.29.1",
+		"moment-timezone": "^0.5.34",
 		"react": "^17.0.2",
 		"react-custom-scrollbars": "^4.2.1",
 		"react-custom-scrollbars-2": "^4.4.0",

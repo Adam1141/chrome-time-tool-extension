@@ -1,45 +1,21 @@
 import React, { FC, useEffect, useState } from 'react';
-import moment, { Moment } from 'moment';
-import {
-	ChasingDots,
-	Circle,
-	CubeGrid,
-	DoubleBounce,
-	FadingCircle,
-	FoldingCube,
-	Pulse,
-	RotatingPlane,
-	ThreeBounce,
-	WanderingCubes,
-	Wave,
-} from 'better-react-spinkit';
+import moment, { Moment } from 'moment-timezone';
 import 'react-loading-icons';
-
 import { FcCheckmark } from 'react-icons/fc';
 import { BsQuestion } from 'react-icons/bs';
-import {
-	BallTriangle,
-	Bars,
-	Circles,
-	Grid,
-	Hearts,
-	Oval,
-	Puff,
-	Rings,
-	SpinningCircles,
-	TailSpin,
-	ThreeDots,
-} from 'react-loading-icons';
+import { Circles } from 'react-loading-icons';
 import tippy, { Instance, Props } from 'tippy.js';
 
 interface MagicDateTimeInputProps {
 	setMenuMoment: React.Dispatch<React.SetStateAction<Moment>>;
 	setIsRealtimeUpdateOn: React.Dispatch<React.SetStateAction<boolean>>;
+	selectedTimezone: React.MutableRefObject<string>;
 }
 
 const MagicDateTimeInput: FC<MagicDateTimeInputProps> = ({
 	setMenuMoment,
 	setIsRealtimeUpdateOn,
+	selectedTimezone,
 }) => {
 	const [dateString, setDateString] = useState<any>(null);
 	const [isProcessing, setIsProcessing] = useState(false);
@@ -60,10 +36,10 @@ const MagicDateTimeInput: FC<MagicDateTimeInputProps> = ({
 		const isUnixSeconds = unixSecondsRegex.test(dateString);
 		const isUnixMillis = unixMillisRegex.test(dateString);
 		const momentFromString = isUnixSeconds
-			? moment.unix(parseInt(dateString))
+			? moment.unix(parseInt(dateString)).tz(selectedTimezone.current)
 			: isUnixMillis
-			? moment(parseInt(dateString))
-			: moment(dateString);
+			? moment(parseInt(dateString)).tz(selectedTimezone.current)
+			: moment(dateString).tz(selectedTimezone.current);
 		const isValid = momentFromString.isValid();
 		if (isValid) setMenuMoment(momentFromString);
 

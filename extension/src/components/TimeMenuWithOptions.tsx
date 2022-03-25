@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, memo, useEffect, useRef, useState } from 'react';
 import { BsPauseCircleFill, BsPlayCircleFill } from 'react-icons/bs';
 import InputDateAndTime from './InputDateAndTime';
 import MagicDateTimeInput from './MagicDateTimeInput';
@@ -6,31 +6,46 @@ import TimeMenu from './TimeMenu';
 import { ImMagicWand } from 'react-icons/im';
 import { AiFillCalendar } from 'react-icons/ai';
 import tippy from 'tippy.js';
-import moment, { Moment } from 'moment';
+import moment, { Moment } from 'moment-timezone';
+import AsyncSelect from 'react-select/async';
+import makeAnimatied from 'react-select/animated';
 
 interface TimeMenuWithOptionsProps {
 	isRealtimeUpdateOn: boolean;
 	setIsRealtimeUpdateOn: React.Dispatch<React.SetStateAction<boolean>>;
 	setGlobMoment: React.Dispatch<React.SetStateAction<Moment>>;
 	initialMoment: Moment;
+	selectedTimezone: React.MutableRefObject<string>;
 }
+
+const timezoneOptions = moment.tz.names().map((loc) => {
+	return { label: loc, value: loc };
+});
+
+// console.log(timezoneOptions);
+// console.log(moment.tz.names());
 
 const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 	isRealtimeUpdateOn,
 	setIsRealtimeUpdateOn,
 	setGlobMoment,
 	initialMoment,
+	selectedTimezone,
 }) => {
 	const [menuMoment, setMenuMoment] = useState(initialMoment);
 	const [realtimeUpdateInterval, setRealtimeUpdateInterval] = useState(1000);
 	const [isMagicInputOn, setIsMagicInputOn] = useState(false);
-	const tippyMagincInputInstance = useRef<any>(null);
+	const tippyMagicInputInstance = useRef<any>(null);
+	const timezoneSelectMenu = useRef<any>(null);
+	const maxTimezoneItemsAtOnce = useRef(20);
 
 	function updateTime() {
 		if (!isRealtimeUpdateOn) return;
-		if (!menuMoment) setMenuMoment(moment());
-		const milliseconds = moment().milliseconds();
-		const wiatForMs = 1000 - milliseconds;
+		if (!menuMoment) setMenuMoment(moment().tz(selectedTimezone.current));
+		const milliseconds = moment()
+			.tz(selectedTimezone.current)
+			.milliseconds();
+		const waitForMs = 1000 - milliseconds;
 		const timeoutToken = setTimeout(() => {
 			let isOn;
 			setIsRealtimeUpdateOn((cur) => {
@@ -38,9 +53,9 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 				return cur;
 			});
 			if (!isOn) return;
-			setMenuMoment(moment());
+			setMenuMoment(moment().tz(selectedTimezone.current));
 			updateTime();
-		}, wiatForMs);
+		}, waitForMs);
 		return timeoutToken;
 	}
 
@@ -48,9 +63,24 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 		setIsRealtimeUpdateOn((cur) => !cur);
 	}
 
-	useEffect(() => {
-		const timeoutToken: any = updateTime();
+	function filterTimezonesOptions(inputValue: string) {
+		return timezoneOptions
+			.filter((tz) =>
+				tz.label.toLowerCase().includes(inputValue.toLowerCase()),
+			)
+			.slice(0, maxTimezoneItemsAtOnce.current);
+	}
 
+	function searchTimezoneOptions(inputValue: string) {
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				resolve(filterTimezonesOptions(inputValue));
+			}, 100);
+		});
+	}
+
+	useEffect(() => {
+		const timeoutToken: any = isRealtimeUpdateOn ? updateTime() : null;
 		return () => {
 			clearTimeout(timeoutToken);
 		};
@@ -84,7 +114,7 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 	}, [isRealtimeUpdateOn]);
 
 	useEffect(() => {
-		const tippyInstance = (tippyMagincInputInstance.current = tippy(
+		const tippyInstance = (tippyMagicInputInstance.current = tippy(
 			'#magic-input-switch',
 			{
 				content: isMagicInputOn
@@ -109,9 +139,8 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 		return () => {
 			tippyInstance[0].destroy();
 		};
-		console.log(tippyMagincInputInstance.current);
 
-		// tippyMagincInputInstance.current[0].reference._tippy.setContent(
+		// tippyMagicInputInstance.current[0].reference._tippy.setContent(
 		// 	isMagicInputOn ? 'Normal Date Input' : 'Magic Date Input',
 		// );
 	}, [isMagicInputOn]);
@@ -138,6 +167,7 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 					<MagicDateTimeInput
 						setIsRealtimeUpdateOn={setIsRealtimeUpdateOn}
 						setMenuMoment={setMenuMoment}
+						selectedTimezone={selectedTimezone}
 					/>
 				)) || (
 					<InputDateAndTime
@@ -146,21 +176,63 @@ const TimeMenuWithOptions: FC<TimeMenuWithOptionsProps> = ({
 						setIsRealtimeUpdateOn={setIsRealtimeUpdateOn}
 						setGlobMoment={setGlobMoment}
 						setMenuMoment={setMenuMoment}
+						selectedTimezone={selectedTimezone}
 					/>
 				)}
+
 				<div
 					id="magic-input-switch"
 					className="w-7.5 h-7.5 bg-indigo-500 rounded-full flex items-center justify-center hover:cursor-pointer hover:bg-indigo-400 transition-all duration-300 group"
 					onClick={() => setIsMagicInputOn((cur) => !cur)}
 				>
 					{(isMagicInputOn && (
-						<AiFillCalendar className="text-md text-gray-200 transition-all duration-300 border-none outline-none group-hover:text-gray-700" />
+						<AiFillCalendar className="w-7.5 text-md text-gray-200 transition-all duration-300 border-none outline-none group-hover:text-gray-700" />
 					)) || (
-						<ImMagicWand className="text-md text-gray-200 transition-all duration-300 border-none outline-none group-hover:text-gray-700" />
+						<ImMagicWand className="w-7.5 text-md text-gray-200 transition-all duration-300 border-none outline-none group-hover:text-gray-700" />
 					)}
 				</div>
+
+				<AsyncSelect
+					ref={timezoneSelectMenu}
+					className="text-xs w-full text-indigo-900"
+					defaultValue={{
+						label: moment.tz.guess(),
+						value: moment.tz.guess(),
+					}}
+					defaultOptions={timezoneOptions.slice(0, maxTimezoneItemsAtOnce.current)}
+					onChange={(e: any) => {
+						selectedTimezone.current = e.value;
+						setMenuMoment(moment(menuMoment).tz(selectedTimezone.current));
+					}}
+					placeholder="Search.."
+					cacheOptions
+					components={makeAnimatied()}
+					loadOptions={searchTimezoneOptions}
+					maxMenuHeight={200}
+					styles={{
+						menu: (provided, state) => ({
+							...provided,
+							background: 'rgb(224 231 255)',
+						}),
+						control: (provided, state) => ({
+							...provided,
+							background: 'rgb(224 231 255)',
+						}),
+					}}
+					theme={(theme) => ({
+						...theme,
+						borderRadius: 5,
+						colors: {
+						  ...theme.colors,
+						  primary25: 'rgb(199 210 254)',
+						},
+					  })}
+				/>
 			</div>
-			<TimeMenu menuMoment={menuMoment} />
+			<TimeMenu
+				menuMoment={menuMoment}
+				selectedTimezone={selectedTimezone}
+			/>
 		</div>
 	);
 };

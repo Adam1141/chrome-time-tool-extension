@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useRef, useState, memo } from 'react';
-import moment, { Moment } from 'moment';
+import React, { FC, useEffect } from 'react';
+import moment, { Moment } from 'moment-timezone';
 
 interface InputDateAndTimeProps {
 	initialMoment?: Moment;
@@ -8,23 +8,32 @@ interface InputDateAndTimeProps {
 	isRealtimeUpdateOn?: boolean;
 	setIsRealtimeUpdateOn?: React.Dispatch<React.SetStateAction<boolean>>;
 	setMenuMoment: React.Dispatch<React.SetStateAction<Moment>>;
+	selectedTimezone: React.MutableRefObject<string>;
 }
 
 const InputDateAndTime: FC<InputDateAndTimeProps> = ({
-	initialMoment = moment(),
+	initialMoment,
 	menuMoment,
 	setGlobMoment,
 	setMenuMoment,
 	isRealtimeUpdateOn,
 	setIsRealtimeUpdateOn,
+	selectedTimezone,
 }) => {
 	useEffect(() => {
 		// console.log(
 		// 	menuMoment.subtract(menuMoment.utcOffset()).toISOString(true)
 		// );
-		console.log(
-			menuMoment.toISOString(true).split('').slice(0, -6).join(''),
-		);
+		// console.log(
+		// 	menuMoment.toISOString(true).split('').slice(0, -6).join(''),
+		// );
+		// console.log(
+		// 	menuMoment
+		// 		.format('YYYY/MM/DDTHH:mm:ss.SSS')
+		// 		.split('')
+		// 		.slice(0, -6)
+		// 		.join(''),
+		// );
 	});
 	return (
 		<div>
@@ -34,20 +43,18 @@ const InputDateAndTime: FC<InputDateAndTimeProps> = ({
 				name="year"
 				onChange={(e) => {
 					setIsRealtimeUpdateOn && setIsRealtimeUpdateOn(false);
-					setGlobMoment(moment(e.target.value));
-					setMenuMoment(moment(e.target.value));
+					setGlobMoment(moment(e.target.value).tz(selectedTimezone.current));
+					setMenuMoment(moment(e.target.value).tz(selectedTimezone.current));
 					// console.log(`date: ${new Date(e.target.value)}`);
 				}}
 				onInvalid={(e) => e.preventDefault()}
 				value={menuMoment
-					.toISOString(true)
-					.split('')
-					.slice(0, -6)
-					.join('')}
+					.tz(selectedTimezone.current)
+					.format('YYYY-MM-DDTHH:mm:ss.SSS')}
 			/>
 		</div>
 	);
 };
 
-export default memo(InputDateAndTime);
+export default InputDateAndTime;
 // export default InputDateAndTime;

@@ -47,7 +47,7 @@ const TimeMenuItem: FC<TimeMenuItemProps> = ({
 			ref={item}
 			className={`${
 				isFirstInList ? 'mb-1' : ''
-			} opacity-0 bg-indigo-200 flex justify-between font-mono rounded-md transition-all`}
+			} opacity-0 bg-indigo-100 flex justify-between font-mono rounded-md transition-all`}
 		>
 			<div className="flex overflow-hidden">
 				<p className="bg-indigo-500 text-gray-200 text-xs font-bold rounded-l-md px-2 mr-4 whitespace-nowrap flex items-center ">
