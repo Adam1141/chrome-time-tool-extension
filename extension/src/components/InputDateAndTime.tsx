@@ -41,10 +41,18 @@ const InputDateAndTime: FC<InputDateAndTimeProps> = ({
 				className="bg-indigo-100 py-1 px-3 rounded-md focus:outline-indigo-300 h-9 w-80"
 				type="datetime-local"
 				name="year"
+				onClick={(e) =>
+					setIsRealtimeUpdateOn && setIsRealtimeUpdateOn(false)
+				}
 				onChange={(e) => {
 					setIsRealtimeUpdateOn && setIsRealtimeUpdateOn(false);
-					setGlobMoment(moment(e.target.value).tz(selectedTimezone.current));
-					setMenuMoment(moment(e.target.value).tz(selectedTimezone.current));
+					setGlobMoment(
+						moment.tz(e.target.value, selectedTimezone.current),
+					);
+					setMenuMoment(
+						moment.tz(e.target.value, selectedTimezone.current),
+					);
+					// console.log(`e.target.value => ${e.target.value}`);
 					// console.log(`date: ${new Date(e.target.value)}`);
 				}}
 				onInvalid={(e) => e.preventDefault()}

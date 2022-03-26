@@ -20,7 +20,7 @@ const MagicDateTimeInput: FC<MagicDateTimeInputProps> = ({
 	const [dateString, setDateString] = useState<any>(null);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [waitBeforeProcessing, setWaitBeforeProcessing] = useState(750);
-	const [isGood, setIsGood] = useState<any>(null);
+	const [isGood, setIsGood] = useState<boolean | null>(null);
 
 	function handleEnteredDate(e: React.ChangeEvent<HTMLInputElement>) {
 		setIsRealtimeUpdateOn(false);
@@ -39,15 +39,16 @@ const MagicDateTimeInput: FC<MagicDateTimeInputProps> = ({
 			? moment.unix(parseInt(dateString)).tz(selectedTimezone.current)
 			: isUnixMillis
 			? moment(parseInt(dateString)).tz(selectedTimezone.current)
-			: moment(dateString).tz(selectedTimezone.current);
+			: moment.tz(dateString, selectedTimezone.current);
 		const isValid = momentFromString.isValid();
 		if (isValid) setMenuMoment(momentFromString);
+		console.log('magic.tz(): ' + momentFromString.tz());
 
-		console.log(
-			`${dateString} is a ${
-				isValid ? 'valid date' : 'nope'
-			} --- ${momentFromString}`,
-		);
+		// console.log(
+		// 	`${dateString} is a ${
+		// 		isValid ? 'valid date' : 'nope'
+		// 	} --- ${momentFromString}`,
+		// );
 		return isValid;
 	}
 
