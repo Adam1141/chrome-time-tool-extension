@@ -8,9 +8,7 @@
 		"tabs",
 		"activeTab",
 		"scripting",
-		"contextMenus",
-		"http://*/*",
-		"https://*/*"
+		"contextMenus"
 	],
 	"action": {
 		"default_popup": "/build/index.html",
@@ -30,7 +28,11 @@
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["handle-selection.js"]
+			"js": [
+				"moment.js",
+				"moment-timezone-with-data.js",
+				"handle-selection.js"
+			]
 		}
 	],
 	"web_accessible_resources": [
@@ -38,7 +40,10 @@
 			"resources": [
 				"selection-popup.html",
 				"tailwind.min.css",
-				"moment.js"
+				"tailwindcss.js",
+				"moment.js",
+				"moment-timezone-with-data.js",
+				"tailwind.js"
 			],
 			"matches": ["http://*/*", "https://*/*"]
 		}
