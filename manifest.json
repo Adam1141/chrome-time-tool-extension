@@ -40,7 +40,6 @@
 			"resources": [
 				"selection-popup.html",
 				"tailwind.min.css",
-				"tailwindcss.js",
 				"moment.js",
 				"moment-timezone-with-data.js",
 				"tailwind.js"

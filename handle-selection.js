@@ -1,68 +1,61 @@
 console.log('### content-script start ###');
-const body = document.body;
-addMomentJsToHead(document);
-addTailwindFileToHead(document);
-body.addEventListener('mouseup', (e) => {
-	const doc = e.target.ownerDocument;
-	const body = e.target.ownerDocument.body;
-	const selectedText = getSelectedText(doc);
-	console.log(`selected text = ${selectedText}`);
-	localStorage.setItem('selectedTimeText', doc.getSelection());
 
-	if (selectedText.length > 0 && guessDateFromDateString(selectedText)) {
-		showPopupDivSelectionPosition(
-			doc,
-			moment(guessDateFromDateString(selectedText)),
-		);
+document.addEventListener('mouseup', (e) => {
+	// or selectionchange
+	const selectedText = getSelectedText(document);
+	console.log(`selected text = ${selectedText}`);
+	localStorage.setItem('selectedTimeText', document.getSelection());
+	const momentObj = guessDateFromDateString(selectedText);
+	if (selectedText.length > 0 && momentObj) {
+		// showPopupDivSelectionPosition(
+		// 	document,
+		// 	moment(guessDateFromDateString(selectedText)),
+		// );
+		removePopupIframe();
+
+		timePopupIframe(momentObj);
 	}
-	// showPopupIframeMouseUpPosition(doc, e);
+	// showPopupIframeMouseUpPosition(document, e);
 });
 
-function showPopupDivSelectionPosition(
-	doc,
-	momentObj = 123123,
-	offsetX = 5,
-	offsetY = 0,
-) {
-	const { x: fromLeft, y: fromTop } = getSelectionCoords(doc, false);
-	console.log(`fromLeft=${fromLeft} | fromTop=${fromTop}`);
-	if (isPopupIframeShown(doc)) removePopupIframe(doc);
-	const popupDiv = `<div id='popupDiv' style='top: ${
-		fromTop + offsetY
-	}px; left: ${
-		fromLeft + offsetX
-	}px; z-index: 9999;' class='absolute w-56 rounded-lg overflow-hidden bg-indigo-300/50'>
-	<h1 id="popup-time" class="text-center text-2xl font-semibold">${momentObj.toString()}</h1>
-	</div>`;
-	doc.body.insertAdjacentHTML('afterbegin', popupDiv);
-}
+const timePopupIframe = (momentObj) => {
+	const { x: fromLeft, y: fromTop } = getSelectionCoords(false);
+	const ifm = document.createElement('iframe');
+	ifm.id = 'popupTimeIframe';
+	document.body.appendChild(ifm);
+	ifm.style = `position: absolute; z-index: 9999; top: ${fromTop}px; left: ${fromLeft}px;`;
+	ifm.contentWindow.document
+		.write(`<body class="bg-indigo-300 bg-opacity-40 p-4 rounded-lg">
+					<script src="${chrome.runtime.getURL('tailwind.js')}"></script>
+					<p class="text-xs font-mono">${momentObj}</p>
+				</body>`);
 
-function showPopupIframeMouseUpPosition(
-	doc,
-	mouseEvent,
-	offsetX = 5,
-	offsetY = 0,
-) {
-	addTailwindFileToHead(doc);
-	// addMomentJsToHead(doc);
-	const { x: fromLeft, y: fromTop } = relativeCoordsMouseEventFromBody(
-		doc,
-		mouseEvent,
-	);
-	// console.log(`fromLeft=${fromLeft} | fromTop=${fromTop}`);
-	if (isPopupIframeShown(doc)) removePopupIframe(doc);
-	const popupDiv = `<iframe id='popupDiv' style='top: ${
-		fromTop + offsetX
-	}px; left: ${
-		fromLeft + offsetY
-	}px; z-index: 9999;' class='absolute w-56 rounded-lg overflow-hidden' src='${chrome.runtime.getURL(
-		'/selection-popup.html',
-	)}' title='On-Selection Popup'></iframe>`;
-	body.insertAdjacentHTML('afterbegin', popupDiv);
-}
+	// `
+	// <iframe style="position: absolute; z-index: 9999; top: ${fromTop}px; left: ${fromLeft}px;">
+	// 	<!DOCTYPE html>
+	// 	<html>
+	// 		<head>
+	// 			<script defer src="${chrome.runtime.getURL('moment.js')}"></script>
+	// 			<script defer src="${chrome.runtime.getURL(
+	// 				'moment-timezone-with-data.js',
+	// 			)}"></script>
+	// 			<link rel="stylesheet" href="${chrome.runtime.getURL('tailwind.min.css')}">
+	// 		</head>
+	// 		<body class="bg-indigo-300 p-4 rounded-lg">
+	// 		<script defer src="${chrome.runtime.getURL('moment.js')}"></script>
+	// 			<script defer src="${chrome.runtime.getURL(
+	// 				'moment-timezone-with-data.js',
+	// 			)}"></script>
+	// 			<link rel="stylesheet" href="${chrome.runtime.getURL('tailwind.min.css')}">
+	// 			<p class="text-md font-mono">${momentObj}</p>
+	// 		</body>
+	// 	</html>
+	// </iframe>
+	// `;
+};
 
-function addMomentJsToHead(doc) {
-	if (isMomentJsFileAlreadyAdded(doc)) return;
+function addMomentJsToHead() {
+	if (isMomentJsFileAlreadyAdded()) return;
 	let s1 = document.createElement('script');
 	s1.src = chrome.runtime.getURL('moment.js');
 	s1.onload = function () {
@@ -78,61 +71,59 @@ function addMomentJsToHead(doc) {
 	(document.head || document.documentElement).appendChild(s2);
 }
 
-function isMomentJsFileAlreadyAdded(doc) {
-	return doc.querySelector(
+function isMomentJsFileAlreadyAdded() {
+	return document.querySelector(
 		`script[src='${chrome.runtime.getURL('/moment.js')}']`,
 	)
 		? true
 		: false;
 }
 
-function removePopupIframe(doc) {
-	if (!isPopupIframeShown(doc)) return;
-	getPopupIframe(doc).remove();
+function removePopupIframe() {
+	if (!isPopupIframeShown()) return;
+	getPopupIframe().remove();
 }
 
-function isPopupIframeShown(doc) {
-	return getPopupIframe(doc) ? true : false;
+function isPopupIframeShown() {
+	return getPopupIframe() ? true : false;
 }
 
-function getPopupIframe(doc) {
-	return doc.querySelector(`#popupDiv`);
+function getPopupIframe() {
+	return document.querySelector(`#popupTimeIframe`);
 }
 
-function isTailwindFileAlreadyAdded(doc) {
-	return doc.querySelector(
+function isTailwindFileAlreadyAdded() {
+	return document.querySelector(
 		`link[href='${chrome.runtime.getURL('/tailwind.min.css')}']`,
 	)
 		? true
 		: false;
 }
 
-function addTailwindFileToHead(doc) {
-	if (isTailwindFileAlreadyAdded(doc)) return;
-	// doc.head.insertAdjacentHTML(
+function addTailwindFileToHead() {
+	if (isTailwindFileAlreadyAdded()) return;
+	const link = document.createElement('link');
+	link.href = chrome.runtime.getURL('/tailwind.min.css');
+	link.rel = 'stylesheet';
+	document.head.appendChild(link);
+
+	// document.head.insertAdjacentHTML(
 	// 	'beforeend',
 	// 	`<link rel="stylesheet" href="${chrome.runtime.getURL(
 	// 		'/tailwind.min.css',
 	// 	)}" />`,
 	// );
-	let s1 = document.createElement('script');
-	s1.src = chrome.runtime.getURL('tailwindcss.js');
-	s1.onload = function () {
-		this.remove();
-	};
-	(document.head || document.documentElement).appendChild(s1);
 
-	// let l1 = document.createElement('link');
-	// l1.href = chrome.runtime.getURL('tailwind.min.css');
-	// l1.type = 'stylesheet';
-	// l1.onload = function () {
+	// let s1 = document.createElement('script');
+	// s1.src = chrome.runtime.getURL('tailwindcss.js');
+	// s1.onload = function () {
 	// 	this.remove();
 	// };
-	// (document.head || document.documentElement).appendChild(l1);
+	// (document.head || document.documentElement).appendChild(s1);
 }
 
-function relativeCoordsMouseEventFromBody(doc, event) {
-	var bounds = doc.body.getBoundingClientRect();
+function relativeCoordsMouseEventFromBody(event) {
+	var bounds = document.body.getBoundingClientRect();
 	var x = parseInt(event.clientX - bounds.left);
 	var y = parseInt(event.clientY - bounds.top);
 	return { x: x, y: y };
@@ -140,8 +131,8 @@ function relativeCoordsMouseEventFromBody(doc, event) {
 
 // atStart: if true, returns coord of the beginning of the selection,
 //          if false, returns coord of the end of the selection
-function getSelectionCoords(doc, atStart) {
-	const sel = doc.getSelection();
+function getSelectionCoords(atStart) {
+	const sel = document.getSelection();
 	const defaultCoords = { x: 0, y: 0 };
 	// check if selection exists
 	if (!sel.rangeCount) return defaultCoords;
@@ -170,7 +161,7 @@ function getSelectionCoords(doc, atStart) {
 }
 
 function guessDateFromDateString(dateString) {
-	const tz = 'Israel';
+	const tz = moment.tz.guess();
 	const unixSecondsRegex = new RegExp(/^\d{10}$/);
 	const unixMillisRegex = new RegExp(/^\d{13}$/);
 	const isUnixSeconds = unixSecondsRegex.test(dateString);
@@ -191,8 +182,8 @@ function guessDateFromDateString(dateString) {
 	return isValid ? momentFromString.toString() : false;
 }
 
-function getSelectedText(doc) {
-	let elem = doc.activeElement;
+function getSelectedText() {
+	let elem = document.activeElement;
 	let elemType = elem ? elem.tagName.toLowerCase() : 'none';
 	if (elemType === 'input' || elemType === 'textarea') {
 		return elem.value.substr(
@@ -205,8 +196,8 @@ function getSelectedText(doc) {
 		return window.getSelection().toString();
 	}
 
-	if (doc.selection && doc.selection.type !== 'Control') {
-		return doc.selection.createRange().text;
+	if (document.selection && document.selection.type !== 'Control') {
+		return document.selection.createRange().text;
 	}
 	return '';
 }
