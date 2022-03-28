@@ -4,23 +4,19 @@ let timezone = 'Israel';
 const timeOptions = [
 	{
 		label: 'Local',
-		valueCb: (momentObj) =>
-			'' + momentObj.toString(),
+		valueCb: (momentObj) => '' + momentObj.toString(),
 	},
 	{
 		label: 'ISO',
-		valueCb: (momentObj) =>
-			momentObj.toISOString(),
+		valueCb: (momentObj) => momentObj.toISOString(),
 	},
 	{
 		label: 'UTC',
-		valueCb: (momentObj) =>
-			momentObj.utc().toString(),
+		valueCb: (momentObj) => momentObj.utc().toString(),
 	},
 	{
 		label: 'Epoch Seconds',
-		valueCb: (momentObj) =>
-			momentObj.unix().toString(),
+		valueCb: (momentObj) => momentObj.unix().toString(),
 	},
 	{
 		label: 'Epoch Milliseconds',
@@ -35,10 +31,7 @@ const timeOptions = [
 						word[0].toUpperCase() + word.substring(1).toLowerCase(),
 				)
 				.join(' '),
-			valueCb: (momentObj) =>
-				momentObj
-					
-					.format(moment.HTML5_FMT[objKey]),
+			valueCb: (momentObj) => momentObj.format(moment.HTML5_FMT[objKey]),
 		};
 	}),
 	{
@@ -104,9 +97,6 @@ document.addEventListener('mouseup', (e) => {
 		localStorage.setItem('selectedTimeText', document.getSelection());
 		removePopupIframe();
 		timePopupIframe(momentObj);
-		timeOptions.forEach((obj) => {
-			console.log(obj.label + ' --> ' + obj.valueCb(momentObj));
-		});
 	}
 });
 
@@ -115,19 +105,19 @@ const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 	const ifm = document.createElement('iframe');
 	ifm.id = 'popupTimeIframe';
 	document.body.appendChild(ifm);
-	ifm.style = `width: 300px; position: absolute; z-index: 9999; top: ${
+	ifm.style = `border: 0; outline: 0; backgorund: transparent; width: 350px; position: absolute; z-index: 9999; top: ${
 		fromTop + offsetY
 	}px; left: ${fromLeft + offsetX}px;`;
 	ifm.contentWindow.document.write(`
 				<head>
-					<link rel="stylesheet" href="${chrome.runtime.getURL('popup.css')}"/>
+					<link rel="stylesheet" href="${chrome.runtime.getURL('/styles/popup.css')}"/>
+					<link rel="stylesheet" href="${chrome.runtime.getURL(
+						'/styles/normalize.css',
+					)}"/>
 				</head>
 				<body>
-					<div class="main-div">
+					<div class="main-div bg-ind">
 						<script src="${chrome.runtime.getURL('/js/popup-iframe-logic.js')}"></script>
-						<div>
-							<p class="time-para">${momentObj}</p>
-						</div>
 					</div>
 				</body>`);
 
@@ -141,24 +131,116 @@ const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 		.querySelector('div')
 		.appendChild(btnCloseIfm);
 
-	// add copy button (img)
-	const copyBtn = document.createElement('img');
-	copyBtn.src = chrome.runtime.getURL('/images/copy.png');
-	copyBtn.alt = 'copy button image';
-	copyBtn.className = 'copy-btn';
-	ifm.contentWindow.document.body.querySelector('div').appendChild(copyBtn);
 	btnCloseIfm.addEventListener('click', removePopupIframe);
 
-	copyBtn.addEventListener('click', (e) => handleCopyBtnClick(e, copyBtn));
+	timeOptions.forEach((obj) => {
+		// create time div
+
+		const timeDiv = document.createElement('div');
+		timeDiv.className = 'time-div';
+
+		// add copy button (img)
+		const copyBtn = document.createElement('img');
+		copyBtn.src = chrome.runtime.getURL('/images/copy.png');
+		copyBtn.alt = 'copy button image';
+		copyBtn.className = 'copy-btn';
+		// ifm.contentWindow.document.body
+		// 	.querySelector('div')
+		// 	.appendChild(copyBtn);
+		copyBtn.addEventListener('click', (e) =>
+			handleCopyBtnClick(e, copyBtn, obj.valueCb(momentObj)),
+		);
+
+		// add time para
+		const timePara = document.createElement('p');
+		timePara.className = 'time-para';
+		timePara.innerText = obj.valueCb(momentObj);
+
+		// add time format label
+		const formatLabel = document.createElement('p');
+		formatLabel.innerHTML =
+			`<abbr title="${obj.label}">${obj.label}</abbr>`;
+		formatLabel.className = 'time-format-label';
+
+		timeDiv.appendChild(copyBtn);
+		timeDiv.appendChild(timePara);
+		timeDiv.appendChild(formatLabel);
+
+		// append timeDiv to ifm main-div
+
+		ifm.contentWindow.document.body
+			.querySelector('.main-div')
+			.appendChild(timeDiv);
+	});
 };
 
-function handleCopyBtnClick(e, copyBtn) {
-	navigator.clipboard.writeText(momentObj).catch(console.log);
+function handleCopyBtnClick(e, copyBtn, stringValue = momentObj) {
+	copyTextToClipboard(stringValue);
 	copyBtn.src = chrome.runtime.getURL('/images/checked.png');
-
 	setTimeout(() => {
 		copyBtn.src = chrome.runtime.getURL('/images/copy.png');
 	}, 1000);
+}
+
+function copyTextToClipboard(text) {
+	if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+		navigator.clipboard.writeText(stringValue);
+		return;
+	}
+	var textArea = document.createElement('textarea');
+
+	//
+	// *** This styling is an extra step which is likely not required. ***
+	//
+	// Why is it here? To ensure:
+	// 1. the element is able to have focus and selection.
+	// 2. if the element was to flash render it has minimal visual impact.
+	// 3. less flakyness with selection and copying which **might** occur if
+	//    the textarea element is not visible.
+	//
+	// The likelihood is the element won't even render, not even a
+	// flash, so some of these are just precautions. However in
+	// Internet Explorer the element is visible whilst the popup
+	// box asking the user for permission for the web page to
+	// copy to the clipboard.
+	//
+
+	// Place in the top-left corner of screen regardless of scroll position.
+	textArea.style.position = 'fixed';
+	textArea.style.top = 0;
+	textArea.style.left = 0;
+
+	// Ensure it has a small width and height. Setting to 1px / 1em
+	// doesn't work as this gives a negative w/h on some browsers.
+	textArea.style.width = '2em';
+	textArea.style.height = '2em';
+
+	// We don't need padding, reducing the size if it does flash render.
+	textArea.style.padding = 0;
+
+	// Clean up any borders.
+	textArea.style.border = 'none';
+	textArea.style.outline = 'none';
+	textArea.style.boxShadow = 'none';
+
+	// Avoid flash of the white box if rendered for any reason.
+	textArea.style.background = 'transparent';
+
+	textArea.value = text;
+
+	document.body.appendChild(textArea);
+	textArea.focus();
+	textArea.select();
+
+	try {
+		var successful = document.execCommand('copy');
+		var msg = successful ? 'successful' : 'unsuccessful';
+		console.log('Copying text command was ' + msg);
+	} catch (err) {
+		console.log('Oops, unable to copy');
+	}
+
+	document.body.removeChild(textArea);
 }
 
 function addMomentJsToHead() {

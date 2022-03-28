@@ -39,11 +39,12 @@
 		{
 			"resources": [
 				"/js/popup-iframe-logic.js",
-				"popup.css",
+				"/styles/popup.css",
+				"/styles/normalize.css",
 				"/images/copy.png",
 				"/images/checked.png"
 			],
-			"matches": ["http://*/*", "https://*/*"]
+			"matches": ["<all_urls>"]
 		}
 	]
 }

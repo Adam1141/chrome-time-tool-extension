@@ -6,18 +6,26 @@
 
 .main-div {
 	/* bg-indigo-300 bg-opacity-75 p-2 pr-5 rounded-lg min-h-fit relative */
-	position: relative;
-	background: rgb(165 180 252 / 0.9);
+	background: rgba(165, 171, 252, 0.877);
 	padding: 0.5rem;
-	padding-right: 3rem;
+	padding-right: 2rem;
 	border-radius: 5px 0px 20px 20px;
-	min-height: 50px;
+	/* min-height: 50px; */
 	max-width: 400px;
 	width: auto;
-	
+
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: center;
+	row-gap: 0.2rem;
+	/* column-gap: 0.5rem; */
+}
+
+.time-div {
 	display: flex;
 	align-items: center;
-	/* column-gap: 0.5rem; */
+	width: 100%;
 }
 
 .time-para {
@@ -28,12 +36,50 @@
 	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
 		'Liberation Mono', 'Courier New', monospace;
 	font-weight: 700;
+	flex: 1;
+}
+
+.time-format-label {
+	background: rgb(99, 102, 241);
+	color: white;
+	font-size: 0.75rem;
+	line-height: 2rem;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+		'Liberation Mono', 'Courier New', monospace;
+	font-weight: 700;
+	align-self: stretch;
+	padding: 0.5rem;
+	text-align: center;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	width: max-content;
+	max-width: 70px;
+	flex-grow: 1;
+	border-radius: 5px;
+	text-decoration: none;
+	cursor: context-menu;
+}
+
+.time-format-label abbr {
+	display: block;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+abbr[title] {
+	border-bottom: none !important;
+	cursor: inherit !important;
+	text-decoration: none !important;
 }
 
 .close-ifm-btn {
 	/* bg-indigo-500 text-2xl text-white cursor-pointer absolute top-0 right-0 w-10 h-10 font-mono text-center hover:opacity-75 duration-300 pb-2 pl-2 transition rounded-bl-full */
 
-	position: absolute;
+	position: fixed;
 	top: 0;
 	right: 0;
 	width: 2rem;
@@ -53,6 +99,8 @@
 	padding-left: 0.5rem;
 	border-bottom-left-radius: 9999px;
 	transition: 0.3s;
+	border: 0;
+	outline: 0;
 }
 
 .close-ifm-btn:hover {
@@ -66,6 +114,7 @@
 	height: auto;
 	transition: 0.3s;
 	cursor: pointer;
+	margin: 0.5rem;
 }
 
 .copy-btn:hover {
