@@ -8,7 +8,7 @@
 	/* bg-indigo-300 bg-opacity-75 p-2 pr-5 rounded-lg min-h-fit relative */
 	background: rgba(165, 171, 252, 0.877);
 	padding: 0.5rem;
-	padding-right: 2rem;
+	padding-right: 2.2rem;
 	border-radius: 5px 0px 20px 20px;
 	/* min-height: 50px; */
 	max-width: 400px;
@@ -42,7 +42,7 @@
 .time-format-label {
 	background: rgb(99, 102, 241);
 	color: white;
-	font-size: 0.75rem;
+	font-size: 0.6rem;
 	line-height: 2rem;
 	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
 		'Liberation Mono', 'Courier New', monospace;
@@ -51,10 +51,10 @@
 	padding: 0.5rem;
 	text-align: center;
 	overflow: hidden;
-	white-space: nowrap;
+	white-space: wrap;
 	text-overflow: ellipsis;
 	width: max-content;
-	max-width: 70px;
+	max-width: 80px;
 	flex-grow: 1;
 	border-radius: 5px;
 	text-decoration: none;
@@ -120,4 +120,5 @@ abbr[title] {
 .copy-btn:hover {
 	opacity: 0.5;
 	transition: 0.3s;
+
 }

@@ -1,26 +1,27 @@
 console.log('### content-script start ###');
 let momentObj; // will hold moment object for valid dates only
 let timezone = 'Israel';
+
 const timeOptions = [
 	{
 		label: 'Local',
-		valueCb: (momentObj) => '' + momentObj.toString(),
+		valueCb: (momentObj) => '' + momentObj.tz(timezone).toString(),
 	},
 	{
 		label: 'ISO',
-		valueCb: (momentObj) => momentObj.toISOString(),
+		valueCb: (momentObj) => momentObj.tz(timezone).toISOString(),
 	},
 	{
 		label: 'UTC',
-		valueCb: (momentObj) => momentObj.utc().toString(),
+		valueCb: (momentObj) => momentObj.tz(timezone).utc().toString(),
 	},
 	{
 		label: 'Epoch Seconds',
-		valueCb: (momentObj) => momentObj.unix().toString(),
+		valueCb: (momentObj) => momentObj.tz(timezone).unix().toString(),
 	},
 	{
 		label: 'Epoch Milliseconds',
-		valueCb: (momentObj) => '' + momentObj,
+		valueCb: (momentObj) => '' + momentObj.tz(timezone),
 	},
 	...Object.keys(moment.HTML5_FMT).map((objKey) => {
 		return {
@@ -86,19 +87,9 @@ const timeOptions = [
 	},
 ];
 
-document.addEventListener('mouseup', (e) => {
-	// or selectionchange
-
-	const selectedText = getSelectedText(document);
-	console.log(`selected text = ${selectedText}`);
-	const newMomentObj = guessDateFromDateString(selectedText);
-	if (selectedText.length > 0 && newMomentObj) {
-		momentObj = newMomentObj;
-		localStorage.setItem('selectedTimeText', document.getSelection());
-		removePopupIframe();
-		timePopupIframe(momentObj);
-	}
-});
+document.addEventListener('keyup', handleKeyupEvent);
+document.addEventListener('mouseup', handleMouseupEvent);
+window.addEventListener('resize', handleResizeEvent);
 
 const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 	const { x: fromLeft, y: fromTop } = getSelectionMarkPosition();
@@ -116,7 +107,7 @@ const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 					)}"/>
 				</head>
 				<body>
-					<div class="main-div bg-ind">
+					<div class="main-div">
 						<script src="${chrome.runtime.getURL('/js/popup-iframe-logic.js')}"></script>
 					</div>
 				</body>`);
@@ -144,9 +135,6 @@ const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 		copyBtn.src = chrome.runtime.getURL('/images/copy.png');
 		copyBtn.alt = 'copy button image';
 		copyBtn.className = 'copy-btn';
-		// ifm.contentWindow.document.body
-		// 	.querySelector('div')
-		// 	.appendChild(copyBtn);
 		copyBtn.addEventListener('click', (e) =>
 			handleCopyBtnClick(e, copyBtn, obj.valueCb(momentObj)),
 		);
@@ -158,8 +146,7 @@ const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 
 		// add time format label
 		const formatLabel = document.createElement('p');
-		formatLabel.innerHTML =
-			`<abbr title="${obj.label}">${obj.label}</abbr>`;
+		formatLabel.innerHTML = `<abbr title="${obj.label}">${obj.label}</abbr>`;
 		formatLabel.className = 'time-format-label';
 
 		timeDiv.appendChild(copyBtn);
@@ -172,19 +159,64 @@ const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 			.querySelector('.main-div')
 			.appendChild(timeDiv);
 	});
+
+	preventIfmOutsideBody(ifm);
 };
+
+function preventIfmOutsideBody(ifm) {
+	const bodyWidth = document.body.clientWidth;
+	const ifmFromLeft = ifm.getBoundingClientRect().x;
+	const ifmWidth = ifm.getBoundingClientRect().width;
+	const pixelsOutsideOfBody = ifmWidth + ifmFromLeft - bodyWidth;
+	console.log(`bodyWidth: ${bodyWidth}`);
+	console.log(`ifmFromLeft: ${ifmFromLeft}`);
+	console.log(`ifmWidth: ${ifmWidth}`);
+	console.log(`pixelsOutsideOfBody: ${pixelsOutsideOfBody}`);
+	if (pixelsOutsideOfBody > 0) {
+		ifm.style.left = `${ifmFromLeft - pixelsOutsideOfBody}px`;
+	}
+}
+
+function handleKeyupEvent(e) {
+	if (e.key === 'Escape') {
+		// on ESC keyup close iframe if it is already open
+		// console.log('ESC keyup!!!');
+		removePopupIframe();
+	}
+}
+
+function handleMouseupEvent(e) {
+	const selectedText = getSelectedText(document);
+	console.log(`selected text = ${selectedText}`);
+	const newMomentObj = guessDateFromDateString(selectedText);
+	if (selectedText.length > 0 && newMomentObj) {
+		momentObj = newMomentObj;
+		localStorage.setItem('selectedTimeText', document.getSelection());
+		removePopupIframe();
+		timePopupIframe(momentObj);
+	}
+}
+
+function handleResizeEvent(e) {
+	removePopupIframe();
+}
 
 function handleCopyBtnClick(e, copyBtn, stringValue = momentObj) {
 	copyTextToClipboard(stringValue);
 	copyBtn.src = chrome.runtime.getURL('/images/checked.png');
+
+	const timeDivLabel = copyBtn.parentNode.querySelector('.time-format-label');
+	const labelInnerHTML = timeDivLabel.innerHTML;
+	timeDivLabel.innerText = 'COPIED';
 	setTimeout(() => {
 		copyBtn.src = chrome.runtime.getURL('/images/copy.png');
+		timeDivLabel.innerHTML = labelInnerHTML;
 	}, 1000);
 }
 
 function copyTextToClipboard(text) {
 	if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
-		navigator.clipboard.writeText(stringValue);
+		navigator.clipboard.writeText(text);
 		return;
 	}
 	var textArea = document.createElement('textarea');
