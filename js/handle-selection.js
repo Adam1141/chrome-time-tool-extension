@@ -1,6 +1,12 @@
-console.log('### content-script start ###');
+// console.log('### content-script start ###');
 let momentObj; // will hold moment object for valid dates only
-let timezone = 'Israel';
+let timezone = localStorage.getItem('timezone') || moment.tz.guess();
+let isMagicPopupOn = localStorage.getItem('isMagicPopupOn') || true;
+let minDateStrLength = localStorage.getItem('minDateStrLength') || 8;
+let maxDateStrLength = localStorage.getItem('maxDateStrLength') || 50;
+
+
+
 
 const timeOptions = [
 	{
@@ -87,9 +93,15 @@ const timeOptions = [
 	},
 ];
 
-document.addEventListener('keyup', handleKeyupEvent);
-document.addEventListener('mouseup', handleMouseupEvent);
-window.addEventListener('resize', handleResizeEvent);
+if (isMagicPopupOn) {
+	document.addEventListener('keyup', handleKeyupEvent);
+	document.addEventListener('mouseup', handleMouseupEvent);
+	window.addEventListener('resize', handleResizeEvent);
+} else {
+	document.removeEventListener('keyup', handleKeyupEvent);
+	document.removeEventListener('mouseup', handleMouseupEvent);
+	window.removeEventListener('resize', handleResizeEvent);
+}
 
 const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 	const { x: fromLeft, y: fromTop } = getSelectionMarkPosition();
@@ -168,10 +180,6 @@ function preventIfmOutsideBody(ifm) {
 	const ifmFromLeft = ifm.getBoundingClientRect().x;
 	const ifmWidth = ifm.getBoundingClientRect().width;
 	const pixelsOutsideOfBody = ifmWidth + ifmFromLeft - bodyWidth;
-	console.log(`bodyWidth: ${bodyWidth}`);
-	console.log(`ifmFromLeft: ${ifmFromLeft}`);
-	console.log(`ifmWidth: ${ifmWidth}`);
-	console.log(`pixelsOutsideOfBody: ${pixelsOutsideOfBody}`);
 	if (pixelsOutsideOfBody > 0) {
 		ifm.style.left = `${ifmFromLeft - pixelsOutsideOfBody}px`;
 	}
@@ -187,7 +195,7 @@ function handleKeyupEvent(e) {
 
 function handleMouseupEvent(e) {
 	const selectedText = getSelectedText(document);
-	console.log(`selected text = ${selectedText}`);
+	// console.log(`selected text = ${selectedText}`);
 	const newMomentObj = guessDateFromDateString(selectedText);
 	if (selectedText.length > 0 && newMomentObj) {
 		momentObj = newMomentObj;
@@ -275,31 +283,6 @@ function copyTextToClipboard(text) {
 	document.body.removeChild(textArea);
 }
 
-function addMomentJsToHead() {
-	if (isMomentJsFileAlreadyAdded()) return;
-	let s1 = document.createElement('script');
-	s1.src = chrome.runtime.getURL('moment.js');
-	s1.onload = function () {
-		this.remove();
-	};
-	(document.head || document.documentElement).appendChild(s1);
-
-	let s2 = document.createElement('script');
-	s2.src = chrome.runtime.getURL('moment-timezone-with-data.js');
-	s2.onload = function () {
-		this.remove();
-	};
-	(document.head || document.documentElement).appendChild(s2);
-}
-
-function isMomentJsFileAlreadyAdded() {
-	return document.querySelector(
-		`script[src='${chrome.runtime.getURL('/moment.js')}']`,
-	)
-		? true
-		: false;
-}
-
 function removePopupIframe() {
 	if (!isPopupIframeShown()) return;
 	getPopupIframe().remove();
@@ -311,36 +294,6 @@ function isPopupIframeShown() {
 
 function getPopupIframe() {
 	return document.querySelector(`#popupTimeIframe`);
-}
-
-function isTailwindFileAlreadyAdded() {
-	return document.querySelector(
-		`link[href='${chrome.runtime.getURL('/tailwind.min.css')}']`,
-	)
-		? true
-		: false;
-}
-
-function addTailwindFileToHead() {
-	if (isTailwindFileAlreadyAdded()) return;
-	const link = document.createElement('link');
-	link.href = chrome.runtime.getURL('/tailwind.min.css');
-	link.rel = 'stylesheet';
-	document.head.appendChild(link);
-
-	// document.head.insertAdjacentHTML(
-	// 	'beforeend',
-	// 	`<link rel="stylesheet" href="${chrome.runtime.getURL(
-	// 		'/tailwind.min.css',
-	// 	)}" />`,
-	// );
-
-	// let s1 = document.createElement('script');
-	// s1.src = chrome.runtime.getURL('tailwindcss.js');
-	// s1.onload = function () {
-	// 	this.remove();
-	// };
-	// (document.head || document.documentElement).appendChild(s1);
 }
 
 function relativeCoordsMouseEventFromBody(event) {
@@ -382,6 +335,12 @@ function getSelectionCoords(atStart) {
 }
 
 function guessDateFromDateString(dateString) {
+	if (
+		!isMagicPopupOn ||
+		dateString.length < minDateStrLength ||
+		dateString.length > maxDateStrLength
+	)
+		return false;
 	const tz = moment.tz.guess();
 	const unixSecondsRegex = new RegExp(/^\d{10}$/);
 	const unixMillisRegex = new RegExp(/^\d{13}$/);
@@ -393,7 +352,7 @@ function guessDateFromDateString(dateString) {
 		? moment(parseInt(dateString)).tz(tz)
 		: moment.tz(dateString, tz);
 	const isValid = momentFromString.isValid();
-	console.log('magic moment: ' + momentFromString);
+	// console.log('magic moment: ' + momentFromString);
 
 	// console.log(
 	// 	`${dateString} is a ${
@@ -509,4 +468,4 @@ const getSelectionMarkPosition = (function () {
 	};
 })();
 
-console.log('### content-script end ###');
+// console.log('### content-script end ###');
