@@ -29,20 +29,19 @@
 		{
 			"matches": ["http://*/*", "https://*/*"],
 			"js": [
-				"moment.js",
-				"moment-timezone-with-data.js",
-				"handle-selection.js"
+				"/js/moment.js",
+				"/js/moment-timezone-with-data.js",
+				"/js/handle-selection.js"
 			]
 		}
 	],
 	"web_accessible_resources": [
 		{
 			"resources": [
-				"selection-popup.html",
-				"tailwind.min.css",
-				"moment.js",
-				"moment-timezone-with-data.js",
-				"tailwind.js"
+				"/js/popup-iframe-logic.js",
+				"popup.css",
+				"/images/copy.png",
+				"/images/checked.png"
 			],
 			"matches": ["http://*/*", "https://*/*"]
 		}

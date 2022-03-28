@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" href="tailwind.min.css" />
-		<script defer src="moment.js"></script>
-		<script defer src="moment-timezone-with-data.js"></script>
-		<link rel="stylesheet" href="tailwind.min.css">
-		<title>On-Select Popup</title>
+		<link rel="stylesheet" href="/popup.css" />
 	</head>
-	<body
-		class="bg-indigo-300 w-72 h-20 border-2 border-indigo-500 rounded-lg flex items-center justify-center overflow-hidden"
-	>
-		<p class="text-center text-md font-semibold">I am HERE!!!</p>
+	<body class="">
+		<div class="main-div">
+			<script src="popup-iframe-logic.js"></script>
+			<div>
+				<p class="time-para">moment value moment value moment value</p>
+			</div>
+			<img class="copy-btn" src="images/copy.png" alt="copy button image" />
+			<button id="closeIframeBtn" class="close-ifm-btn" title="close">
+				x
+			</button>
+		</div>
 	</body>
 </html>
