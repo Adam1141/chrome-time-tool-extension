@@ -5,7 +5,6 @@ let timezone = moment.tz.guess();
 let isMagicPopupOn = true;
 let minDateStrLength = 8;
 let maxDateStrLength = 50;
-
 loadSettingsFromStorage();
 chrome.storage.onChanged.addListener(loadSettingsFromStorage);
 
@@ -207,7 +206,7 @@ function handleMouseupEvent(e) {
 	const selectedText = getSelectedText(document);
 	// console.log(`selected text = ${selectedText}`);
 	const newMomentObj = guessDateFromDateString(selectedText);
-	if (selectedText.length > 0 && newMomentObj.isValid()) {
+	if (selectedText.length > 0 && newMomentObj) {
 		momentObj = newMomentObj;
 		removePopupIframe();
 		timePopupIframe(momentObj);
