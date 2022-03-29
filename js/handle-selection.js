@@ -9,14 +9,6 @@ let maxDateStrLength = 50;
 loadSettingsFromStorage();
 chrome.storage.onChanged.addListener(loadSettingsFromStorage);
 
-// chrome.storage.sync.set({ foo: 'hello', bar: 'hi' }, function () {
-// 	console.log('Settings saved');
-// });
-
-// chrome.storage.sync.get(['foo', 'bar', 'isMagicPopupOn'], function (items) {
-// 	console.log('Settings retrieved: ', items);
-// });
-
 const timeOptions = [
 	{
 		label: 'Local',
@@ -114,10 +106,10 @@ if (isMagicPopupOn) {
 
 function loadSettingsFromStorage() {
 	chrome.storage.sync.get(
-		['timezone', 'isMagicPopupOn', 'minDateStrLength', 'maxDateStrLength'],
+		['isMagicPopupOn', 'minDateStrLength', 'maxDateStrLength'],
 		function (items) {
 			({ isMagicPopupOn, minDateStrLength, maxDateStrLength } = items);
-			console.log(items);
+			// console.log(items);
 		},
 	);
 }
@@ -132,10 +124,10 @@ const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 	}px; left: ${fromLeft + offsetX}px;`;
 	ifm.contentWindow.document.write(`
 				<head>
-					<link rel="stylesheet" href="${chrome.runtime.getURL('/styles/popup.css')}"/>
 					<link rel="stylesheet" href="${chrome.runtime.getURL(
 						'/styles/normalize.css',
 					)}"/>
+					<link rel="stylesheet" href="${chrome.runtime.getURL('/styles/popup.css')}"/>
 				</head>
 				<body>
 					<div class="main-div">
@@ -157,7 +149,6 @@ const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 
 	timeOptions.forEach((obj) => {
 		// create time div
-
 		const timeDiv = document.createElement('div');
 		timeDiv.className = 'time-div';
 
@@ -216,9 +207,8 @@ function handleMouseupEvent(e) {
 	const selectedText = getSelectedText(document);
 	// console.log(`selected text = ${selectedText}`);
 	const newMomentObj = guessDateFromDateString(selectedText);
-	if (selectedText.length > 0 && newMomentObj) {
+	if (selectedText.length > 0 && newMomentObj.isValid()) {
 		momentObj = newMomentObj;
-		localStorage.setItem('selectedTimeText', document.getSelection());
 		removePopupIframe();
 		timePopupIframe(momentObj);
 	}

@@ -16,7 +16,7 @@ const OnDateStringSelectConfig: FC<OnDateStringSelectConfigProps> = ({}) => {
 				setIsMagicPopupOn(Boolean(items.isMagicPopupOn));
 				setMinDateStrLength(parseInt(items.minDateStrLength));
 				setMaxDateStrLength(parseInt(items.maxDateStrLength));
-				console.log(items);
+				// console.log(items);
 			},
 		);
 	}
@@ -61,7 +61,7 @@ const OnDateStringSelectConfig: FC<OnDateStringSelectConfigProps> = ({}) => {
 				minDateStrLength: minDateStrLength,
 			},
 			function () {
-				console.log('settings changed.');
+				// console.log('settings changed.');
 			},
 		);
 	}, [minDateStrLength, maxDateStrLength, isMagicPopupOn]);
