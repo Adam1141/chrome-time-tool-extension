@@ -5,21 +5,15 @@ interface OnDateStringSelectConfigProps {}
 
 const OnDateStringSelectConfig: FC<OnDateStringSelectConfigProps> = ({}) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [isMagicPopupOn, setisMagicPopupOn] = useState(
-		Boolean(localStorage.getItem('isMagicPopupOn')),
-	);
-	const [minDateStrLength, setMinDateStrLength] = useState(
-		localStorage.getItem('minDateStrLength')
-			? parseInt('' + localStorage.getItem('minDateStrLength'))
-			: 8,
-	);
+	const [isMagicPopupOn, setIsMagicPopupOn] = useState(false);
+	const [minDateStrLength, setMinDateStrLength] = useState(4);
 	const [maxDateStrLength, setMaxDateStrLength] = useState(50);
 
 	function loadSettingsFromStorage() {
 		chrome.storage.sync.get(
 			['isMagicPopupOn', 'minDateStrLength', 'maxDateStrLength'],
 			function (items) {
-				setisMagicPopupOn(Boolean(items.isMagicMenuOpen));
+				setIsMagicPopupOn(Boolean(items.isMagicPopupOn));
 				setMinDateStrLength(parseInt(items.minDateStrLength));
 				setMaxDateStrLength(parseInt(items.maxDateStrLength));
 				console.log(items);
@@ -29,7 +23,7 @@ const OnDateStringSelectConfig: FC<OnDateStringSelectConfigProps> = ({}) => {
 
 	function handleIsMagicPopupChangeEvent(e) {
 		const chkBox = e.target;
-		setisMagicPopupOn(chkBox.checked);
+		setIsMagicPopupOn(chkBox.checked);
 	}
 
 	function handleMinStrLenChangeEvent(e) {
@@ -57,7 +51,7 @@ const OnDateStringSelectConfig: FC<OnDateStringSelectConfigProps> = ({}) => {
 
 	useEffect(() => {
 		loadSettingsFromStorage();
-	},[]);
+	}, []);
 
 	useEffect(() => {
 		chrome.storage.sync.set(
