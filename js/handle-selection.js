@@ -1,12 +1,21 @@
 // console.log('### content-script start ###');
 let momentObj; // will hold moment object for valid dates only
-let timezone = localStorage.getItem('timezone') || moment.tz.guess();
-let isMagicPopupOn = localStorage.getItem('isMagicPopupOn') || true;
-let minDateStrLength = localStorage.getItem('minDateStrLength') || 8;
-let maxDateStrLength = localStorage.getItem('maxDateStrLength') || 50;
 
+let timezone = moment.tz.guess();
+let isMagicPopupOn = true;
+let minDateStrLength = 8;
+let maxDateStrLength = 50;
 
+loadSettingsFromStorage();
+chrome.storage.onChanged.addListener(loadSettingsFromStorage);
 
+// chrome.storage.sync.set({ foo: 'hello', bar: 'hi' }, function () {
+// 	console.log('Settings saved');
+// });
+
+// chrome.storage.sync.get(['foo', 'bar', 'isMagicPopupOn'], function (items) {
+// 	console.log('Settings retrieved: ', items);
+// });
 
 const timeOptions = [
 	{
@@ -101,6 +110,16 @@ if (isMagicPopupOn) {
 	document.removeEventListener('keyup', handleKeyupEvent);
 	document.removeEventListener('mouseup', handleMouseupEvent);
 	window.removeEventListener('resize', handleResizeEvent);
+}
+
+function loadSettingsFromStorage() {
+	chrome.storage.sync.get(
+		['timezone', 'isMagicPopupOn', 'minDateStrLength', 'maxDateStrLength'],
+		function (items) {
+			({ isMagicPopupOn, minDateStrLength, maxDateStrLength } = items);
+			console.log(items);
+		},
+	);
 }
 
 const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {

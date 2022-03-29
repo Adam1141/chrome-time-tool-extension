@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useState } from 'react';
-import moment, { Moment } from 'moment-timezone';
 import { MdArrowForwardIos } from 'react-icons/md';
 
 interface OnDateStringSelectConfigProps {}
@@ -14,16 +13,23 @@ const OnDateStringSelectConfig: FC<OnDateStringSelectConfigProps> = ({}) => {
 			? parseInt('' + localStorage.getItem('minDateStrLength'))
 			: 8,
 	);
-	const [maxDateStrLength, setMaxDateStrLength] = useState(
-		localStorage.getItem('maxDateStrLength')
-			? parseInt('' + localStorage.getItem('maxDateStrLength'))
-			: 50,
-	);
+	const [maxDateStrLength, setMaxDateStrLength] = useState(50);
 
-	function handleMagicPopupChangeEvent(e) {
+	function loadSettingsFromStorage() {
+		chrome.storage.sync.get(
+			['isMagicPopupOn', 'minDateStrLength', 'maxDateStrLength'],
+			function (items) {
+				setisMagicPopupOn(Boolean(items.isMagicMenuOpen));
+				setMinDateStrLength(parseInt(items.minDateStrLength));
+				setMaxDateStrLength(parseInt(items.maxDateStrLength));
+				console.log(items);
+			},
+		);
+	}
+
+	function handleIsMagicPopupChangeEvent(e) {
 		const chkBox = e.target;
 		setisMagicPopupOn(chkBox.checked);
-		localStorage.setItem('isMagicPopupOn', chkBox.checked);
 	}
 
 	function handleMinStrLenChangeEvent(e) {
@@ -50,9 +56,20 @@ const OnDateStringSelectConfig: FC<OnDateStringSelectConfigProps> = ({}) => {
 	}
 
 	useEffect(() => {
-		localStorage.setItem('maxDateStrLength', '' + maxDateStrLength);
-		localStorage.setItem('minDateStrLength', '' + minDateStrLength);
-		localStorage.setItem('isMagicPopupOn', '' + isMagicPopupOn);
+		loadSettingsFromStorage();
+	},[]);
+
+	useEffect(() => {
+		chrome.storage.sync.set(
+			{
+				isMagicPopupOn: isMagicPopupOn,
+				maxDateStrLength: maxDateStrLength,
+				minDateStrLength: minDateStrLength,
+			},
+			function () {
+				console.log('settings changed.');
+			},
+		);
 	}, [minDateStrLength, maxDateStrLength, isMagicPopupOn]);
 
 	return (
@@ -79,7 +96,7 @@ const OnDateStringSelectConfig: FC<OnDateStringSelectConfigProps> = ({}) => {
 						id="isMagicPopupOn"
 						type="checkbox"
 						name="isMagicPopupOn"
-						onChange={handleMagicPopupChangeEvent}
+						onChange={handleIsMagicPopupChangeEvent}
 						checked={isMagicPopupOn}
 					/>
 					<label
