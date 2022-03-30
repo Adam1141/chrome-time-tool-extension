@@ -1,4 +1,6 @@
 // console.log('### content-script start ###');
+
+moment.suppressDeprecationWarnings = true;
 let momentObj; // will hold moment object for valid dates only
 
 let timezone = moment.tz.guess();
@@ -355,9 +357,9 @@ function guessDateFromDateString(dateString) {
 	const isUnixSeconds = unixSecondsRegex.test(dateString);
 	const isUnixMillis = unixMillisRegex.test(dateString);
 	const momentFromString = isUnixSeconds
-		? moment.unix(parseInt(dateString)).tz(tz)
+		? moment.unix(parseInt(dateString), 'X').tz(tz)
 		: isUnixMillis
-		? moment(parseInt(dateString)).tz(tz)
+		? moment(parseInt(dateString), 'x').tz(tz)
 		: moment.tz(dateString, tz);
 	const isValid = momentFromString.isValid();
 	// console.log('magic moment: ' + momentFromString);

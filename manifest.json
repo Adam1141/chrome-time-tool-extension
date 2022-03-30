@@ -1,7 +1,7 @@
 {
 	"short_name": "Time Tool",
 	"name": "Time Tool",
-	"description": "A tool for dealing with and maniplating different time formats easily.",
+	"description": "A tool for dealing with and manipulating different time formats and zones with ease.",
 	"version": "1.0.0",
 	"manifest_version": 3,
 	"permissions": [
