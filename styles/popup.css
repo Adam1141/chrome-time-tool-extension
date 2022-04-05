@@ -7,7 +7,7 @@
 .main-div {
 	/* bg-indigo-300 bg-opacity-75 p-2 pr-5 rounded-lg min-h-fit relative */
 	background: rgba(199, 210, 254, 0.877);
-	
+
 	/* background: rgba(165, 171, 252, 0.877); */
 	padding: 0.5rem;
 	padding-right: 2.2rem;
@@ -122,5 +122,34 @@ abbr[title] {
 .copy-btn:hover {
 	opacity: 0.5;
 	transition: 0.3s;
+}
 
+.offset-div {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	height: 1rem;
+}
+
+.btn-offset,
+.offset-value {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: bold;
+	font-size: 1.25rem;
+	font-family: monospace;
+	width: 2rem;
+	line-height: 1;
+}
+.btn-offset {
+	cursor: pointer;
+	font-size: 2rem;
+}
+
+.disable-select {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }

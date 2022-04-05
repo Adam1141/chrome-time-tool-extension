@@ -4,13 +4,7 @@
 	"description": "A tool for dealing with and manipulating different time formats and zones with ease.",
 	"version": "1.0.0",
 	"manifest_version": 3,
-	"permissions": [
-		"storage",
-		"tabs",
-		"activeTab",
-		"scripting",
-		"contextMenus"
-	],
+	"permissions": ["storage"],
 	"action": {
 		"default_popup": "/build/index.html",
 		"default_icon": {
@@ -28,7 +22,7 @@
 	},
 	"content_scripts": [
 		{
-			"matches": ["http://*/*", "https://*/*"],
+			"matches": ["<all_urls>"],
 			"js": [
 				"/js/moment.js",
 				"/js/moment-timezone-with-data.js",
@@ -39,7 +33,6 @@
 	"web_accessible_resources": [
 		{
 			"resources": [
-				"/js/popup-iframe-logic.js",
 				"/styles/popup.css",
 				"/styles/normalize.css",
 				"/images/copy.png",

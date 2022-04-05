@@ -132,7 +132,6 @@ const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 				</head>
 				<body>
 					<div class="main-div">
-						<script src="${chrome.runtime.getURL('/js/popup-iframe-logic.js')}"></script>
 					</div>
 				</body>`);
 
@@ -143,45 +142,100 @@ const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 	btnCloseIfm.innerText = 'x';
 	btnCloseIfm.title = 'close';
 	ifm.contentWindow.document.body
-		.querySelector('div')
+		.querySelector('.main-div')
 		.appendChild(btnCloseIfm);
+
+	let offsetInHours = 0;
+	const offsetDiv = document.createElement('div');
+	offsetDiv.classList.add('offset-div');
+
+	const btnOffsetIncrement = document.createElement('p');
+	const offsetValuePara = document.createElement('p');
+	const btnOffsetDecrement = document.createElement('p');
+
+	btnOffsetIncrement.innerText = '+';
+	offsetValuePara.innerText = offsetInHours;
+	btnOffsetDecrement.innerText = '-';
+
+	btnOffsetIncrement.classList = 'btn-offset disable-select ';
+	offsetValuePara.classList = 'offset-value disable-select ';
+	btnOffsetDecrement.classList = 'btn-offset disable-select';
+
+	offsetDiv.appendChild(btnOffsetDecrement);
+	offsetDiv.appendChild(offsetValuePara);
+	offsetDiv.appendChild(btnOffsetIncrement);
+
+	btnOffsetIncrement.addEventListener('click', () => {
+		offsetInHours++;
+		offsetValuePara.innerText = offsetInHours;
+		momentObj.add(1, 'hours');
+		reRenderTimeDivs();
+	});
+
+	btnOffsetDecrement.addEventListener('click', () => {
+		offsetInHours--;
+		offsetValuePara.innerText = offsetInHours;
+		momentObj.subtract(1, 'hours');
+		reRenderTimeDivs();
+	});
+
+	ifm.contentWindow.document.body
+		.querySelector('.main-div')
+		.appendChild(offsetDiv);
 
 	btnCloseIfm.addEventListener('click', removePopupIframe);
 
-	timeOptions.forEach((obj) => {
-		// create time div
-		const timeDiv = document.createElement('div');
-		timeDiv.className = 'time-div';
+	function addTimeDivs() {
+		timeOptions.forEach((obj) => {
+			// create time div
+			const timeDiv = document.createElement('div');
+			timeDiv.className = 'time-div';
 
-		// add copy button (img)
-		const copyBtn = document.createElement('img');
-		copyBtn.src = chrome.runtime.getURL('/images/copy.png');
-		copyBtn.alt = 'copy button image';
-		copyBtn.className = 'copy-btn';
-		copyBtn.addEventListener('click', (e) =>
-			handleCopyBtnClick(e, copyBtn, obj.valueCb(momentObj)),
-		);
+			// add copy button (img)
+			const copyBtn = document.createElement('img');
+			copyBtn.src = chrome.runtime.getURL('/images/copy.png');
+			copyBtn.alt = 'copy button image';
+			copyBtn.className = 'copy-btn';
+			copyBtn.addEventListener('click', (e) =>
+				handleCopyBtnClick(e, copyBtn, obj.valueCb(momentObj)),
+			);
 
-		// add time para
-		const timePara = document.createElement('p');
-		timePara.className = 'time-para';
-		timePara.innerText = obj.valueCb(momentObj);
+			// add time para
+			const timePara = document.createElement('p');
+			timePara.className = 'time-para';
+			timePara.innerText = obj.valueCb(momentObj);
 
-		// add time format label
-		const formatLabel = document.createElement('p');
-		formatLabel.innerHTML = `<abbr title="${obj.label}">${obj.label}</abbr>`;
-		formatLabel.className = 'time-format-label';
+			// add time format label
+			const formatLabel = document.createElement('p');
+			formatLabel.innerHTML = `<abbr title="${obj.label}">${obj.label}</abbr>`;
+			formatLabel.className = 'time-format-label';
 
-		timeDiv.appendChild(copyBtn);
-		timeDiv.appendChild(timePara);
-		timeDiv.appendChild(formatLabel);
+			timeDiv.appendChild(copyBtn);
+			timeDiv.appendChild(timePara);
+			timeDiv.appendChild(formatLabel);
 
-		// append timeDiv to ifm main-div
+			// append timeDiv to ifm main-div
 
+			ifm.contentWindow.document.body
+				.querySelector('.main-div')
+				.appendChild(timeDiv);
+		});
+	}
+
+	function removeTimeDivs() {
 		ifm.contentWindow.document.body
-			.querySelector('.main-div')
-			.appendChild(timeDiv);
-	});
+			.querySelectorAll('.time-div')
+			.forEach((elm) => {
+				elm.parentNode.removeChild(elm);
+			});
+	}
+
+	function reRenderTimeDivs() {
+		removeTimeDivs();
+		addTimeDivs();
+	}
+
+	addTimeDivs();
 
 	preventIfmOutsideBody(ifm);
 };
