@@ -13,9 +13,9 @@ const OnDateStringSelectConfig: FC<OnDateStringSelectConfigProps> = ({}) => {
 		chrome.storage.sync.get(
 			['isMagicPopupOn', 'minDateStrLength', 'maxDateStrLength'],
 			function (items) {
-				setIsMagicPopupOn(Boolean(items.isMagicPopupOn));
-				setMinDateStrLength(parseInt(items.minDateStrLength));
-				setMaxDateStrLength(parseInt(items.maxDateStrLength));
+				setIsMagicPopupOn(Boolean(items.isMagicPopupOn) || false);
+				setMinDateStrLength(parseInt(items.minDateStrLength) || 4);
+				setMaxDateStrLength(parseInt(items.maxDateStrLength) || 50);
 				// console.log(items);
 			},
 		);
@@ -86,7 +86,7 @@ const OnDateStringSelectConfig: FC<OnDateStringSelectConfigProps> = ({}) => {
 			>
 				<div className="flex items-center px-2 rounded-md form-check">
 					<input
-						className="form-check-input appearance-none w-6 h-5 mr-2 border-2 rounded-md cursor-pointer border-gray-800 checked:bg-indigo-500"
+						className="form-check-input appearance-none w-7 h-5 mr-2 border-2 rounded-md cursor-pointer border-gray-800 outline-indigo-600 checked:bg-indigo-500"
 						id="isMagicPopupOn"
 						type="checkbox"
 						name="isMagicPopupOn"
@@ -103,7 +103,7 @@ const OnDateStringSelectConfig: FC<OnDateStringSelectConfigProps> = ({}) => {
 						<p className="text-xs text-gray-600 leading-4 pl-2">
 							when selecting any date string in the browser window
 							a menu with multiple formats of that date will popup
-							next to it
+							next to it. (reload browser after enabling)
 						</p>
 					</label>
 				</div>

@@ -132,7 +132,6 @@ const timePopupIframe = (momentObj, offsetX = 5, offsetY = 0) => {
 				</head>
 				<body>
 					<div class="main-div">
-						<script src="${chrome.runtime.getURL('/js/popup-iframe-logic.js')}"></script>
 					</div>
 				</body>`);
 
